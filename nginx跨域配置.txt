@@ -1,0 +1,29 @@
+  1：nginx.conf文件中配置如下server 
+  server {
+        listen       70;                       // 端口可自定义
+        server_name  172.16.16.68;	       // 本地地址
+        error_page  404             /404.html;
+
+        location / {
+            root   E:/wx/wx-page;		// 项目所在目录
+            index  index.html index.htm;
+        }
+	location /apis {                        // apis 自定义
+	    rewrite  ^.+apis/?(.*)$ /$1 break;
+	    include  uwsgi_params;
+	    proxy_pass   http://172.16.16.68:3000;   // 目标地址
+	}
+	    
+    }
+
+   2：通过ajax获取http://172.16.16.68:3000/users/getUsers接口中的数据
+   $.ajax({
+	url: "/apis/users/getUsers",   	//ps：此处不需要加http://172.16.16.68:3000
+	type: "get",
+	dataType:"json",
+	success: function(data) {
+	    console.log(data);
+	}
+    });
+
+   到此完美实现跨越！！！
